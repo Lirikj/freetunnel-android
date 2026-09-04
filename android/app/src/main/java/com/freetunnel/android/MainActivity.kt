@@ -72,12 +72,20 @@ class MainActivity : AppCompatActivity(), AppNotifier {
 
     private fun renderNav() {
         nav.removeAllViews()
-        val items = listOf("⌁" to "Главная", "▤" to "Конфиги", "◇" to "Split", "⚙" to "Настройки", "≡" to "Логи")
+        val items = listOf(
+            R.drawable.logo to "Главная", R.drawable.ic_configs to "Конфиги",
+            R.drawable.ic_network to "Split", R.drawable.ic_settings to "Настройки",
+            R.drawable.ic_log to "Логи"
+        )
         items.forEachIndexed { index, item ->
             nav.addView(LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER
                 background = if (index == currentPage) rounded(TILE, 11f) else null
-                addView(TextView(this@MainActivity).apply { text = item.first; textSize = 21f; setTextColor(if (index == currentPage) TEXT else FAINT); gravity = Gravity.CENTER }, LinearLayout.LayoutParams(-1, dp(31)))
+                addView(ImageView(this@MainActivity).apply {
+                    setImageResource(item.first); scaleType = ImageView.ScaleType.CENTER_INSIDE
+                    imageTintList = ColorStateList.valueOf(if (index == currentPage) TEXT else FAINT)
+                    setPadding(dp(5), dp(5), dp(5), dp(5))
+                }, LinearLayout.LayoutParams(-1, dp(31)))
                 addView(TextView(this@MainActivity).apply { text = item.second; textSize = 10f; setTextColor(if (index == currentPage) TEXT else FAINT); gravity = Gravity.CENTER }, LinearLayout.LayoutParams(-1, dp(22)))
                 setOnClickListener { openPage(index) }
             }, LinearLayout.LayoutParams(0, dp(56), 1f).apply { setMargins(dp(2), 0, dp(2), 0) })
