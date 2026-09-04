@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application android:name=".FreeTunnelApp" android:allowBackup="false" android:label="FreeTunnel"
-        android:icon="@mipmap/ic_launcher" android:theme="@style/Theme.FreeTunnel" android:usesCleartextTraffic="false">
+        android:icon="@drawable/logo" android:roundIcon="@drawable/logo" android:theme="@style/Theme.FreeTunnel" android:usesCleartextTraffic="false">
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/>
