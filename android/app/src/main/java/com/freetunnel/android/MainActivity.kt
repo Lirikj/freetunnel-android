@@ -11,12 +11,15 @@ import android.net.VpnService as AndroidVpnService
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.adguard.trusttunnel.AppNotifier
 import com.adguard.trusttunnel.DeepLink
 import com.adguard.trusttunnel.VpnService
@@ -55,6 +58,11 @@ class MainActivity : AppCompatActivity(), AppNotifier {
 
     private fun buildShell() {
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(BG) }
+        ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
+            val safe = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            view.setPadding(safe.left, safe.top, safe.right, safe.bottom)
+            insets
+        }
         root.addView(TextView(this).apply {
             text = "FreeTunnel"; textSize = 19f; setTextColor(TEXT); typeface = Typeface.DEFAULT_BOLD
             gravity = Gravity.CENTER_VERTICAL; setPadding(dp(20), dp(7), dp(20), 0)
@@ -74,7 +82,7 @@ class MainActivity : AppCompatActivity(), AppNotifier {
         nav.removeAllViews()
         val items = listOf(
             R.drawable.logo to "Главная", R.drawable.ic_configs to "Конфиги",
-            R.drawable.ic_network to "Split", R.drawable.ic_settings to "Настройки",
+            R.drawable.ic_network to "Маршруты", R.drawable.ic_settings to "Настройки",
             R.drawable.ic_log to "Логи"
         )
         items.forEachIndexed { index, item ->
@@ -86,7 +94,10 @@ class MainActivity : AppCompatActivity(), AppNotifier {
                     imageTintList = ColorStateList.valueOf(if (index == currentPage) TEXT else FAINT)
                     setPadding(dp(5), dp(5), dp(5), dp(5))
                 }, LinearLayout.LayoutParams(-1, dp(31)))
-                addView(TextView(this@MainActivity).apply { text = item.second; textSize = 10f; setTextColor(if (index == currentPage) TEXT else FAINT); gravity = Gravity.CENTER }, LinearLayout.LayoutParams(-1, dp(22)))
+                addView(TextView(this@MainActivity).apply {
+                    text = item.second; textSize = 10f; setTextColor(if (index == currentPage) TEXT else FAINT)
+                    gravity = Gravity.CENTER; maxLines = 1; ellipsize = TextUtils.TruncateAt.END
+                }, LinearLayout.LayoutParams(-1, dp(22)))
                 setOnClickListener { openPage(index) }
             }, LinearLayout.LayoutParams(0, dp(56), 1f).apply { setMargins(dp(2), 0, dp(2), 0) })
         }
@@ -144,7 +155,7 @@ class MainActivity : AppCompatActivity(), AppNotifier {
     private fun splitPage(): View = scrollPage("Раздельное туннелирование") { page ->
         page.addView(LinearLayout(this).apply {
             gravity = Gravity.CENTER_VERTICAL
-            addView(text("Split tunneling", 15f, TEXT, true), LinearLayout.LayoutParams(0, dp(52), 1f))
+            addView(text("Раздельное туннелирование", 15f, TEXT, true), LinearLayout.LayoutParams(0, dp(52), 1f))
             addView(Switch(this@MainActivity).apply {
                 isChecked = store.splitEnabled; buttonTintList = ColorStateList.valueOf(ACCENT)
                 setOnCheckedChangeListener { _, value -> store.splitEnabled = value }
@@ -155,7 +166,7 @@ class MainActivity : AppCompatActivity(), AppNotifier {
         modeRow.addView(choice("Обход VPN", store.splitMode == "general") { store.splitMode = "general"; openPage(2) }, LinearLayout.LayoutParams(0, dp(45), 1f))
         modeRow.addView(choice("Через VPN", store.splitMode == "selective") { store.splitMode = "selective"; openPage(2) }, LinearLayout.LayoutParams(0, dp(45), 1f).apply { leftMargin = dp(8) })
         page.addView(modeRow)
-        if (store.splitMode == "selective" && store.splitRules.isBlank()) page.addView(infoCard("Добавьте правило — пустой selective-профиль безопасно переключается на полный туннель."))
+        if (store.splitMode == "selective" && store.splitRules.isBlank()) page.addView(infoCard("Добавьте хотя бы одно правило. Пока список пуст, весь трафик будет направлен через VPN."))
         page.addView(section(if (store.splitMode == "selective") "ПРАВИЛА — ЧЕРЕЗ VPN" else "ПРАВИЛА — ОБХОД VPN"))
         val rules = darkInput("Домены или IP, по одному на строку", store.splitRules, 7)
         page.addView(rules, LinearLayout.LayoutParams(-1, dp(170)))
@@ -169,13 +180,13 @@ class MainActivity : AppCompatActivity(), AppNotifier {
     }
 
     private fun settingsPage(): View = scrollPage("Настройки") { page ->
-        page.addView(settingCard("Автоподключение", "Используйте Android Always-on VPN", "›") { startActivity(Intent(Settings.ACTION_VPN_SETTINGS)) })
-        page.addView(settingCard("Системные настройки VPN", "Kill switch и VPN без подключения", "›") { startActivity(Intent(Settings.ACTION_VPN_SETTINGS)) })
+        page.addView(settingCard("Автоподключение", "Настройте постоянное VPN в Android", "›") { startActivity(Intent(Settings.ACTION_VPN_SETTINGS)) })
+        page.addView(settingCard("Системные настройки VPN", "Блокировка соединений без VPN", "›") { startActivity(Intent(Settings.ACTION_VPN_SETTINGS)) })
         page.addView(section("О ПРИЛОЖЕНИИ"))
         page.addView(LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL; background = rounded(TILE, 11f); setPadding(dp(14), dp(12), dp(14), dp(12))
             addView(ImageView(this@MainActivity).apply { setImageResource(R.drawable.logo) }, LinearLayout.LayoutParams(dp(54), dp(54)))
-            addView(LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(12), 0, 0, 0); addView(text("FreeTunnel Android", 16f, TEXT, true)); addView(text("1.0.1  ·  TrustTunnel 1.1.5-rc.6", 12f, DIM)) }, LinearLayout.LayoutParams(0, -2, 1f))
+            addView(LinearLayout(this@MainActivity).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(12), 0, 0, 0); addView(text("FreeTunnel Android", 16f, TEXT, true)); addView(text("1.0.2  ·  TrustTunnel 1.1.5-rc.6", 12f, DIM)) }, LinearLayout.LayoutParams(0, -2, 1f))
         }, LinearLayout.LayoutParams(-1, dp(82)))
     }
 
