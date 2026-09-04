@@ -1,0 +1,8 @@
+.gradle/
+app/build/
+local.properties
+*.jks
+*.keystore
+!app/src/main/java/com/freetunnel/
+!app/src/main/java/com/freetunnel/android/
+!app/src/main/java/com/freetunnel/android/*.kt

@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.FreeTunnel" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#9E9E9E</item><item name="colorSecondary">#3FBF93</item>
+        <item name="android:fontFamily">sans</item><item name="android:navigationBarColor">#181818</item>
+        <item name="android:windowLightStatusBar">false</item><item name="android:statusBarColor">#181818</item>
+    </style>
+</resources>

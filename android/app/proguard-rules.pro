@@ -1,0 +1,2 @@
+-keep class com.adguard.trusttunnel.** { *; }
+-keepclasseswithmembernames class * { native <methods>; }

@@ -21,6 +21,10 @@ stay in the OS credential store (Keychain / Credential Manager / libsecret.
 
 Updates are verified with SHA-256 manifests and Ed25519 signatures before install.
 
+## Android
+
+The native Android client lives in [`android/`](android/README.md). It includes config import, one-tap connection and the same destination-based split-tunneling modes as the desktop app. GitHub Actions builds an installable APK; `android-v*` tags publish it to Releases.
+
 ## Installation
 
 Download a build for your platform from
